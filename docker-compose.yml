@@ -1,0 +1,47 @@
+version: '3.9'
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      PG_MODE: primary
+      PG_PRIMARY_USER: postgres
+      PG_PRIMARY_PASSWORD: admin
+      PG_DATABASE: postgres
+      PG_USER: postgres
+      PG_PASSWORD: admin
+      PG_ROOT_PASSWORD: admin
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    volumes:
+      - "/var/run/postgres/postgres.sock"
+      - "pgdata:/var/lib/postgresql/data"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - redis:/usr/local/etc/redis/data
+      - ./.docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - redis
+    ports:
+      - 6379:6379
+    expose:
+      - 6379
+
+volumes:
+  redis:
+  pgdata:
+
+networks:
+  postgres:
+    driver: bridge
+  redis:
+    driver: bridge
